@@ -1,0 +1,148 @@
+{
+  "secret_types": {
+    "AWS_SECRET_ACCESS_KEY": {
+      "base_score": 9.5,
+      "tier": "cloud_root",
+      "blast_radius": "Full AWS cloud infrastructure takeover, administrative IAM escalation, and catastrophic data exfiltration."
+    },
+    "AWS_ACCESS_KEY_ID": {
+      "base_score": 9.0,
+      "tier": "cloud_root",
+      "blast_radius": "AWS account access, IAM permission escalation, and cloud resource tampering."
+    },
+    "PRIVATE_KEY": {
+      "base_score": 9.5,
+      "tier": "infrastructure",
+      "blast_radius": "Host server SSH compromise, TLS private key impersonation, or cryptographic signature forgery."
+    },
+    "STRIPE_SECRET_KEY": {
+      "base_score": 9.0,
+      "tier": "financial",
+      "blast_radius": "Direct unauthorized financial transactions, fraudulent refunds, and customer financial PII exposure."
+    },
+    "GITHUB_TOKEN": {
+      "base_score": 8.0,
+      "tier": "code_cicd",
+      "blast_radius": "Source code exfiltration, malicious commits, CI/CD pipeline poisoning, and release tampering."
+    },
+    "OPENAI_API_KEY": {
+      "base_score": 7.5,
+      "tier": "api_service",
+      "blast_radius": "Financial API billing drain, unauthorized model inference, and enterprise prompt/data exposure."
+    },
+    "ANTHROPIC_API_KEY": {
+      "base_score": 7.5,
+      "tier": "api_service",
+      "blast_radius": "Financial API billing drain, rate-limit denial of service, and unauthorized Claude model usage."
+    },
+    "SLACK_TOKEN": {
+      "base_score": 7.0,
+      "tier": "communication",
+      "blast_radius": "Internal workspace communications surveillance, channel history scraping, and member impersonation."
+    },
+    "SLACK_WEBHOOK": {
+      "base_score": 6.5,
+      "tier": "communication",
+      "blast_radius": "Unauthorized messaging broadcast into internal incident channels, phishing, and alert spoofing."
+    },
+    "GOOGLE_API_KEY": {
+      "base_score": 7.0,
+      "tier": "api_service",
+      "blast_radius": "Google Cloud service API quota exhaustion, project billing drain, and unauthorized API usage."
+    },
+    "STRIPE_RESTRICTED_KEY": {
+      "base_score": 6.0,
+      "tier": "financial",
+      "blast_radius": "Scoped financial API operations restricted to specific configured Stripe resources."
+    },
+    "JWT": {
+      "base_score": 6.0,
+      "tier": "identity",
+      "blast_radius": "User authentication session hijacking and unauthorized API access until token expiration."
+    },
+    "GENERIC_PASSWORD": {
+      "base_score": 6.5,
+      "tier": "generic",
+      "blast_radius": "Potential database, internal system, or service account authentication compromise."
+    },
+    "GENERIC_SECRET": {
+      "base_score": 6.0,
+      "tier": "generic",
+      "blast_radius": "Application secret compromise, potentially enabling signature forgery or session decryption."
+    },
+    "GENERIC_API_KEY": {
+      "base_score": 5.5,
+      "tier": "generic",
+      "blast_radius": "Third-party service API key exposure with unconfirmed privilege scope."
+    },
+    "GENERIC_TOKEN": {
+      "base_score": 5.5,
+      "tier": "generic",
+      "blast_radius": "Bearer token exposure with unspecified service endpoint authorization."
+    },
+    "STRIPE_PUBLISHABLE_KEY": {
+      "base_score": 2.0,
+      "tier": "public_readonly",
+      "blast_radius": "Client-side public key intended for browser payment elements; cannot perform administrative or server actions."
+    },
+    "DEFAULT": {
+      "base_score": 5.0,
+      "tier": "unknown",
+      "blast_radius": "Unclassified credential exposure requiring manual privilege determination."
+    }
+  },
+  "pattern_overrides": {
+    "github_refresh_token": {
+      "base_score": 6.0,
+      "blast_radius": "GitHub OAuth refresh token with delayed access potential."
+    },
+    "slack_workspace_token": {
+      "base_score": 6.0,
+      "blast_radius": "Slack workspace-level app token."
+    }
+  },
+  "location_modifiers": {
+    "client_side_js": {
+      "modifier": 1.5,
+      "patterns": [".js", ".jsx", ".ts", ".tsx", ".vue", ".svelte", "/static/", "/frontend/", "/client/", "/public/", "/dist/"],
+      "description": "Exposed in client-side / frontend code accessible by end-user browsers"
+    },
+    "production_config": {
+      "modifier": 1.0,
+      "patterns": [".env", "docker-compose", "k8s", "kubernetes", "terraform", "helm", "settings.py", "config.json", "application.yml"],
+      "description": "Exposed in deployment configuration or environment file"
+    },
+    "cicd_pipeline": {
+      "modifier": 0.8,
+      "patterns": [".github/", ".gitlab-ci.yml", "jenkinsfile", ".circleci/", ".travis.yml", "azure-pipelines"],
+      "description": "Exposed in CI/CD pipeline or automation configuration"
+    },
+    "test_or_docs": {
+      "modifier": -2.0,
+      "patterns": ["test", "fixture", "mock", "doc", "readme", "example"],
+      "description": "Located in test fixture, documentation, or example directory"
+    }
+  },
+  "classifier_modifiers": {
+    "LIKELY_PLACEHOLDER": {
+      "max_score": 2.5,
+      "multiplier": 0.2,
+      "description": "Demoted: identified as dummy or placeholder value"
+    },
+    "UNCERTAIN": {
+      "multiplier": 0.85,
+      "description": "Moderate confidence discount for uncertain classification"
+    },
+    "LIKELY_REAL": {
+      "base_factor": 0.85,
+      "confidence_factor": 0.15,
+      "description": "Real secret confidence weighting"
+    }
+  },
+  "severity_thresholds": {
+    "Critical": 8.5,
+    "High": 6.5,
+    "Medium": 4.0,
+    "Low": 0.0
+  }
+}
